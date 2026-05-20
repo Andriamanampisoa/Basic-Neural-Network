@@ -5,11 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Include header directory
-include_directories(${PROJECT_SOURCE_DIR}/inc)
-
-# Collect sources
-file(GLOB SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+# Collect sources and re-run CMake when new .cpp files are added
+file(GLOB CONFIGURE_DEPENDS SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
