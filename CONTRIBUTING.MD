@@ -48,6 +48,7 @@ We follow the Conventional Commits spec with a few additions:
 #### Types
 
 - `feat`: New feature
+- `task`: General task or improvement
 - `anomaly`: Unexpected behavior that doesn’t break the app
 - `bug`: Issue that breaks the app
 - `refactor`: Code improvements without behavior changes
