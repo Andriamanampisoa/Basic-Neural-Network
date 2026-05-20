@@ -23,7 +23,7 @@ class NeuralNetwork
     /**
      * @brief Destructor for the Neural Network class
      */
-    ~NeuralNetwork() = default;
+    ~NeuralNetwork();
 
     private:
 };
