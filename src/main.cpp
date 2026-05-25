@@ -5,14 +5,11 @@
  * Description: Main entry point for the neural network application
 */
 
-#include <iostream>
-
 /**
  * @file main.cpp
  * @brief Main entry point for the neural network application
  */
 int main()
 {
-    std::cout << "Hello World" << std::endl;
     return (0);
 }
