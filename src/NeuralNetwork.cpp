@@ -7,10 +7,14 @@
 
 #include "NeuralNetwork.hpp"
 
-NeuralNetwork::NeuralNetwork()
+NeuralNetwork::NeuralNetwork(const std::vector<unsigned int> &topology)
 {
-}
+    unsigned int numLayers = topology.size();
 
-NeuralNetwork::~NeuralNetwork()
-{
+    for (unsigned int layerNum = 0; layerNum < numLayers; layerNum++) {
+        __layer.push_back(Layer());
+        for (unsigned int neuronNum = 0; neuronNum <= topology[layerNum]; neuronNum++) {
+            __layer.back().push_back(0.0);
+        }
+    }
 }
