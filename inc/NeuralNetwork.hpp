@@ -46,5 +46,5 @@ class NeuralNetwork
 
     private:
 
-    std::vector<Layer> __layer;
+    std::vector<Layer> _layer;
 };

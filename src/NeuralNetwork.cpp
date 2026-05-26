@@ -12,9 +12,9 @@ NeuralNetwork::NeuralNetwork(const std::vector<unsigned int> &topology)
     unsigned int numLayers = topology.size();
 
     for (unsigned int layerNum = 0; layerNum < numLayers; layerNum++) {
-        __layer.push_back(Layer());
+        _layer.push_back(Layer());
         for (unsigned int neuronNum = 0; neuronNum <= topology[layerNum]; neuronNum++) {
-            __layer.back().push_back(0.0);
+            _layer.back().push_back(0.0);
         }
     }
 }
