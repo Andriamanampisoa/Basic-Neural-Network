@@ -94,6 +94,7 @@ void ArgumentParser::_parse()
             oss << "Invalid layer size at argument " << i << ": \"" << _argv[i]
                 << "\" (expected a positive integer >= " << MIN_NEURONS_PER_LAYER << ").";
             _errorMessage = oss.str();
+            _topology.clear();
             return;
         }
         _topology.push_back(layerSize);
