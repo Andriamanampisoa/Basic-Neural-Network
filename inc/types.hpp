@@ -9,4 +9,6 @@
 
 #include <vector>
 
-typedef std::vector<double> Layer;
+#include "Neuron.hpp"
+
+typedef std::vector<Neuron> Layer;
