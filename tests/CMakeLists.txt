@@ -19,3 +19,14 @@ target_compile_features(ArgumentParserTests PRIVATE cxx_std_17)
 
 include(GoogleTest)
 gtest_discover_tests(ArgumentParserTests)
+
+add_executable(NeuronTests
+    Neuron_test.cpp
+    ${CMAKE_SOURCE_DIR}/src/Neuron.cpp
+)
+
+target_include_directories(NeuronTests PRIVATE ${CMAKE_SOURCE_DIR}/inc)
+target_link_libraries(NeuronTests GTest::gtest_main)
+target_compile_features(NeuronTests PRIVATE cxx_std_17)
+
+gtest_discover_tests(NeuronTests)
