@@ -28,8 +28,9 @@ class NeuralNetwork
 
     /**
      * @brief Forward propagation for the Neural Network class
-     * @param inputValues The input values for the forward propagation
-     * @note Not implemented yet — next step of the project
+     * @details Sets the input layer from inputValues, then feeds each subsequent
+     * layer forward (bias neurons keep output 1.0 and are not updated).
+     * @param inputValues Inputs for the first layer (must match input size, without bias)
      */
     void forwardPropagation(const std::vector<double> &inputValues);
 
@@ -58,6 +59,13 @@ class NeuralNetwork
      * @return Const reference to the layer
      */
     const Layer &getLayer(unsigned int layerIndex) const;
+
+    /**
+     * @brief Access a layer by index (mutable)
+     * @param layerIndex Zero-based layer index
+     * @return Reference to the layer
+     */
+    Layer &getLayer(unsigned int layerIndex);
 
     private:
 

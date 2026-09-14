@@ -8,6 +8,7 @@
 #include "NeuralNetwork.hpp"
 
 #include <stdexcept>
+#include <string>
 
 NeuralNetwork::NeuralNetwork(const std::vector<unsigned int> &topology)
 {
@@ -33,9 +34,32 @@ NeuralNetwork::NeuralNetwork(const std::vector<unsigned int> &topology)
     }
 }
 
-void NeuralNetwork::forwardPropagation(const std::vector<double> & /*inputValues*/)
+void NeuralNetwork::forwardPropagation(const std::vector<double> &inputValues)
 {
-    // TODO: implement in the Forward Propagation step
+    if (_layer.empty()) {
+        throw std::runtime_error("NeuralNetwork::forwardPropagation: network has no layers");
+    }
+
+    Layer &inputLayer = _layer.front();
+    const std::size_t expectedInputs = inputLayer.size() - 1; // exclude bias
+
+    if (inputValues.size() != expectedInputs) {
+        throw std::invalid_argument(
+            "NeuralNetwork::forwardPropagation: expected " + std::to_string(expectedInputs)
+            + " input value(s), got " + std::to_string(inputValues.size()));
+    }
+
+    for (std::size_t i = 0; i < inputValues.size(); ++i) {
+        inputLayer[i].setOutputValue(inputValues[i]);
+    }
+
+    for (std::size_t layerNum = 1; layerNum < _layer.size(); ++layerNum) {
+        const Layer &prevLayer = _layer[layerNum - 1];
+        Layer &layer = _layer[layerNum];
+        for (std::size_t n = 0; n + 1 < layer.size(); ++n) {
+            layer[n].feedForward(prevLayer, static_cast<unsigned int>(n));
+        }
+    }
 }
 
 void NeuralNetwork::backPropagation(const std::vector<double> & /*expectedValues*/)
@@ -65,6 +89,14 @@ unsigned int NeuralNetwork::getLayerCount() const
 }
 
 const Layer &NeuralNetwork::getLayer(unsigned int layerIndex) const
+{
+    if (layerIndex >= _layer.size()) {
+        throw std::out_of_range("NeuralNetwork::getLayer: layer index out of range");
+    }
+    return (_layer[layerIndex]);
+}
+
+Layer &NeuralNetwork::getLayer(unsigned int layerIndex)
 {
     if (layerIndex >= _layer.size()) {
         throw std::out_of_range("NeuralNetwork::getLayer: layer index out of range");
