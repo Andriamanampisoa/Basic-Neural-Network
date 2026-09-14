@@ -18,10 +18,15 @@ NeuralNetwork::NeuralNetwork(const std::vector<unsigned int> &topology)
         _layer.push_back(Layer());
         numOutputs = (layerNum == numLayers - 1) ? 0 : topology[layerNum + 1];
 
-        // topology[layerNum] neurons + 1 bias neuron
-        for (unsigned int neuronNum = 0; neuronNum <= topology[layerNum]; ++neuronNum) {
+        // topology[layerNum] neurons + 1 bias neuron (separate push avoids
+        // unsigned wraparound if neuronNum ever reached UINT_MAX)
+        const unsigned int layerSize = topology[layerNum];
+
+        _layer.back().reserve(static_cast<std::size_t>(layerSize) + 1u);
+        for (unsigned int neuronNum = 0; neuronNum < layerSize; ++neuronNum) {
             _layer.back().push_back(Neuron(numOutputs));
         }
+        _layer.back().push_back(Neuron(numOutputs));
 
         // Bias neuron is the last neuron of the layer; its output is always 1.0
         _layer.back().back().setOutputValue(1.0);

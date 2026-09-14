@@ -37,7 +37,9 @@ void ArgumentParser::printUsage(std::ostream &os, const char *programName)
     const char *name = (programName && programName[0] != '\0') ? programName : "BasicNeuralNetwork";
 
     os << "Usage: " << name << " <topology...>\n"
-       << "  topology: positive integers, neurons per layer (input, hidden..., output)\n"
+       << "  topology: positive integers (" << MIN_NEURONS_PER_LAYER
+       << ".." << MAX_NEURONS_PER_LAYER
+       << "), neurons per layer (input, hidden..., output)\n"
        << "  Example:  " << name << " 3 3 3 2\n";
 }
 
@@ -55,7 +57,7 @@ bool ArgumentParser::_parseLayerSize(const char *arg, unsigned int &value) const
     result = std::from_chars(arg, arg + len, parsed);
     if (result.ec != std::errc{} || result.ptr != arg + len)
         return (false);
-    if (parsed < MIN_NEURONS_PER_LAYER)
+    if (parsed < MIN_NEURONS_PER_LAYER || parsed > MAX_NEURONS_PER_LAYER)
         return (false);
     value = parsed;
     return (true);
@@ -92,7 +94,8 @@ void ArgumentParser::_parse()
         if (!_parseLayerSize(_argv[i], layerSize)) {
             oss.str("");
             oss << "Invalid layer size at argument " << i << ": \"" << _argv[i]
-                << "\" (expected a positive integer >= " << MIN_NEURONS_PER_LAYER << ").";
+                << "\" (expected a positive integer between " << MIN_NEURONS_PER_LAYER
+                << " and " << MAX_NEURONS_PER_LAYER << ").";
             _errorMessage = oss.str();
             _topology.clear();
             return;

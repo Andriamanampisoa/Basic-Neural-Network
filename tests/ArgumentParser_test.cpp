@@ -93,6 +93,35 @@ TEST(ArgumentParserTest, ValidTopology_LargeLayerSizes)
     EXPECT_EQ(parser.getTopology()[1], 512u);
 }
 
+TEST(ArgumentParserTest, ValidTopology_MaxNeuronsPerLayer)
+{
+    ArgumentParser parser = makeParser({"BasicNeuralNetwork", "8192", "8192"});
+
+    ASSERT_TRUE(parser.isValid());
+    EXPECT_EQ(parser.getTopology()[0], 8192u);
+    EXPECT_EQ(parser.getTopology()[1], 8192u);
+}
+
+TEST(ArgumentParserTest, InvalidLayerSize_ExceedsMaximum)
+{
+    ArgumentParser parser = makeParser({"BasicNeuralNetwork", "8193", "3"});
+
+    EXPECT_FALSE(parser.isValid());
+    EXPECT_EQ(parser.getTopology().size(), 0u);
+    EXPECT_EQ(parser.getErrorMessage(),
+              "Invalid layer size at argument 1: \"8193\" (expected a positive integer between 1 and 8192).");
+}
+
+TEST(ArgumentParserTest, InvalidLayerSize_RejectsUintMax)
+{
+    ArgumentParser parser = makeParser({"BasicNeuralNetwork", "4294967295", "3"});
+
+    EXPECT_FALSE(parser.isValid());
+    EXPECT_EQ(parser.getTopology().size(), 0u);
+    EXPECT_EQ(parser.getErrorMessage(),
+              "Invalid layer size at argument 1: \"4294967295\" (expected a positive integer between 1 and 8192).");
+}
+
 TEST(ArgumentParserTest, ValidTopology_MaxLayerCount)
 {
     std::vector<std::string> args = {"BasicNeuralNetwork"};
@@ -151,7 +180,7 @@ TEST(ArgumentParserTest, InvalidLayerSize_NonNumeric)
     EXPECT_FALSE(parser.isValid());
     EXPECT_EQ(parser.getTopology().size(), 0u);
     EXPECT_EQ(parser.getErrorMessage(),
-              "Invalid layer size at argument 2: \"abc\" (expected a positive integer >= 1).");
+              "Invalid layer size at argument 2: \"abc\" (expected a positive integer between 1 and 8192).");
 }
 
 TEST(ArgumentParserTest, InvalidLayerSize_Zero)
@@ -160,7 +189,7 @@ TEST(ArgumentParserTest, InvalidLayerSize_Zero)
 
     EXPECT_FALSE(parser.isValid());
     EXPECT_EQ(parser.getErrorMessage(),
-              "Invalid layer size at argument 1: \"0\" (expected a positive integer >= 1).");
+              "Invalid layer size at argument 1: \"0\" (expected a positive integer between 1 and 8192).");
 }
 
 TEST(ArgumentParserTest, InvalidLayerSize_Negative)
@@ -169,7 +198,7 @@ TEST(ArgumentParserTest, InvalidLayerSize_Negative)
 
     EXPECT_FALSE(parser.isValid());
     EXPECT_EQ(parser.getErrorMessage(),
-              "Invalid layer size at argument 1: \"-1\" (expected a positive integer >= 1).");
+              "Invalid layer size at argument 1: \"-1\" (expected a positive integer between 1 and 8192).");
 }
 
 TEST(ArgumentParserTest, InvalidLayerSize_PlusSignPrefix)
@@ -178,7 +207,7 @@ TEST(ArgumentParserTest, InvalidLayerSize_PlusSignPrefix)
 
     EXPECT_FALSE(parser.isValid());
     EXPECT_EQ(parser.getErrorMessage(),
-              "Invalid layer size at argument 1: \"+5\" (expected a positive integer >= 1).");
+              "Invalid layer size at argument 1: \"+5\" (expected a positive integer between 1 and 8192).");
 }
 
 TEST(ArgumentParserTest, InvalidLayerSize_Decimal)
@@ -187,7 +216,7 @@ TEST(ArgumentParserTest, InvalidLayerSize_Decimal)
 
     EXPECT_FALSE(parser.isValid());
     EXPECT_EQ(parser.getErrorMessage(),
-              "Invalid layer size at argument 1: \"3.5\" (expected a positive integer >= 1).");
+              "Invalid layer size at argument 1: \"3.5\" (expected a positive integer between 1 and 8192).");
 }
 
 TEST(ArgumentParserTest, InvalidLayerSize_TrailingCharacters)
@@ -196,7 +225,7 @@ TEST(ArgumentParserTest, InvalidLayerSize_TrailingCharacters)
 
     EXPECT_FALSE(parser.isValid());
     EXPECT_EQ(parser.getErrorMessage(),
-              "Invalid layer size at argument 1: \"12abc\" (expected a positive integer >= 1).");
+              "Invalid layer size at argument 1: \"12abc\" (expected a positive integer between 1 and 8192).");
 }
 
 TEST(ArgumentParserTest, InvalidLayerSize_EmptyArgument)
@@ -205,7 +234,7 @@ TEST(ArgumentParserTest, InvalidLayerSize_EmptyArgument)
 
     EXPECT_FALSE(parser.isValid());
     EXPECT_EQ(parser.getErrorMessage(),
-              "Invalid layer size at argument 1: \"\" (expected a positive integer >= 1).");
+              "Invalid layer size at argument 1: \"\" (expected a positive integer between 1 and 8192).");
 }
 
 TEST(ArgumentParserTest, InvalidLayerSize_FailsOnFirstInvalidArgument)
@@ -215,7 +244,7 @@ TEST(ArgumentParserTest, InvalidLayerSize_FailsOnFirstInvalidArgument)
     EXPECT_FALSE(parser.isValid());
     EXPECT_EQ(parser.getTopology().size(), 0u);
     EXPECT_EQ(parser.getErrorMessage(),
-              "Invalid layer size at argument 2: \"bad\" (expected a positive integer >= 1).");
+              "Invalid layer size at argument 2: \"bad\" (expected a positive integer between 1 and 8192).");
 }
 
 TEST(ArgumentParserTest, PrintUsage_CustomProgramName)

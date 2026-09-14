@@ -55,6 +55,8 @@ class ArgumentParser
 
     static constexpr unsigned int MIN_LAYERS = 2;
     static constexpr unsigned int MIN_NEURONS_PER_LAYER = 1;
+    /** Per-layer cap so topology[n] + 1 (bias) cannot wrap unsigned int. */
+    static constexpr unsigned int MAX_NEURONS_PER_LAYER = 8192;
     static constexpr unsigned int MAX_LAYERS = 256;
 
     int _argc;
