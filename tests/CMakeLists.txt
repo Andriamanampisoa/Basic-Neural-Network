@@ -30,3 +30,15 @@ target_link_libraries(NeuronTests GTest::gtest_main)
 target_compile_features(NeuronTests PRIVATE cxx_std_17)
 
 gtest_discover_tests(NeuronTests)
+
+add_executable(NeuralNetworkTests
+    NeuralNetwork_test.cpp
+    ${CMAKE_SOURCE_DIR}/src/NeuralNetwork.cpp
+    ${CMAKE_SOURCE_DIR}/src/Neuron.cpp
+)
+
+target_include_directories(NeuralNetworkTests PRIVATE ${CMAKE_SOURCE_DIR}/inc)
+target_link_libraries(NeuralNetworkTests GTest::gtest_main)
+target_compile_features(NeuralNetworkTests PRIVATE cxx_std_17)
+
+gtest_discover_tests(NeuralNetworkTests)
