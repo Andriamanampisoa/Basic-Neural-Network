@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 
+#include <cmath>
 #include <stdexcept>
 #include <vector>
 
@@ -87,16 +88,102 @@ TEST(NeuralNetworkTest, GetLayer_ThrowsOnOutOfRange)
     EXPECT_THROW(network.getLayer(99), std::out_of_range);
 }
 
-TEST(NeuralNetworkTest, ForwardPropagation_StubDoesNotThrow)
-{
-    NeuralNetwork network({2, 2});
-
-    EXPECT_NO_THROW(network.forwardPropagation({0.1, 0.2}));
-}
-
 TEST(NeuralNetworkTest, BackPropagation_StubDoesNotThrow)
 {
     NeuralNetwork network({2, 2});
 
     EXPECT_NO_THROW(network.backPropagation({1.0, 0.0}));
+}
+
+TEST(NeuralNetworkTest, ForwardPropagation_ThrowsOnWrongInputSize)
+{
+    NeuralNetwork network({3, 2});
+
+    EXPECT_THROW(network.forwardPropagation({0.1, 0.2}), std::invalid_argument);
+    EXPECT_THROW(network.forwardPropagation({0.1, 0.2, 0.3, 0.4}), std::invalid_argument);
+}
+
+TEST(NeuralNetworkTest, ForwardPropagation_SetsInputLayerValues)
+{
+    NeuralNetwork network({2, 1});
+
+    network.forwardPropagation({0.3, -0.8});
+
+    EXPECT_DOUBLE_EQ(network.getLayer(0)[0].getOutputValue(), 0.3);
+    EXPECT_DOUBLE_EQ(network.getLayer(0)[1].getOutputValue(), -0.8);
+    EXPECT_DOUBLE_EQ(network.getLayer(0).back().getOutputValue(), 1.0);
+}
+
+TEST(NeuralNetworkTest, ForwardPropagation_KeepsBiasNeuronsAtOne)
+{
+    NeuralNetwork network({2, 2, 1});
+
+    network.forwardPropagation({0.5, -0.5});
+
+    EXPECT_DOUBLE_EQ(network.getLayer(0).back().getOutputValue(), 1.0);
+    EXPECT_DOUBLE_EQ(network.getLayer(1).back().getOutputValue(), 1.0);
+    EXPECT_DOUBLE_EQ(network.getLayer(2).back().getOutputValue(), 1.0);
+}
+
+TEST(NeuralNetworkTest, ForwardPropagation_OutputsAreInTanhRange)
+{
+    NeuralNetwork network({2, 3, 2});
+
+    network.forwardPropagation({0.7, -0.2});
+
+    std::vector<double> results;
+    network.getResults(results);
+
+    ASSERT_EQ(results.size(), 2u);
+    for (double value : results) {
+        EXPECT_GE(value, -1.0);
+        EXPECT_LE(value, 1.0);
+    }
+}
+
+TEST(NeuralNetworkTest, ForwardPropagation_MatchesManualComputationWithFixedWeights)
+{
+    // topology 1 → 1 (plus bias on each layer)
+    NeuralNetwork network({1, 1});
+
+    Layer &inputLayer = network.getLayer(0);
+    inputLayer[0].setConnectionWeight(0, 0.5);  // input → output
+    inputLayer[1].setConnectionWeight(0, -0.25); // bias → output
+
+    network.forwardPropagation({2.0});
+
+    const double expectedSum = 2.0 * 0.5 + 1.0 * (-0.25); // 0.75
+    const double expectedOutput = std::tanh(expectedSum);
+
+    std::vector<double> results;
+    network.getResults(results);
+
+    ASSERT_EQ(results.size(), 1u);
+    EXPECT_NEAR(results[0], expectedOutput, 1e-12);
+    EXPECT_DOUBLE_EQ(network.getLayer(1).back().getOutputValue(), 1.0);
+}
+
+TEST(NeuralNetworkTest, ForwardPropagation_TwoLayerHiddenMatchesChainedTanh)
+{
+    // topology 1 → 1 → 1 with fixed weights
+    NeuralNetwork network({1, 1, 1});
+
+    Layer &inputLayer = network.getLayer(0);
+    Layer &hiddenLayer = network.getLayer(1);
+
+    inputLayer[0].setConnectionWeight(0, 1.0);
+    inputLayer[1].setConnectionWeight(0, 0.0);
+    hiddenLayer[0].setConnectionWeight(0, 1.0);
+    hiddenLayer[1].setConnectionWeight(0, 0.0);
+
+    network.forwardPropagation({0.5});
+
+    const double hidden = std::tanh(0.5 * 1.0 + 1.0 * 0.0);
+    const double output = std::tanh(hidden * 1.0 + 1.0 * 0.0);
+
+    std::vector<double> results;
+    network.getResults(results);
+
+    ASSERT_EQ(results.size(), 1u);
+    EXPECT_NEAR(results[0], output, 1e-12);
 }

@@ -52,6 +52,21 @@ class Neuron
     const std::vector<Connection> &getOutputConnections() const;
 
     /**
+     * @brief Set the weight of an outgoing connection
+     * @param connectionIndex Index of the connection (target neuron index)
+     * @param weight New weight value
+     */
+    void setConnectionWeight(unsigned int connectionIndex, double weight);
+
+    /**
+     * @brief Compute this neuron's output from the previous layer
+     * @details sum = Σ (prevOutput * weight_to_this_neuron), then apply transferFunction
+     * @param prevLayer Previous layer (including its bias neuron)
+     * @param myIndex Index of this neuron in its own layer (used to select weights)
+     */
+    void feedForward(const std::vector<Neuron> &prevLayer, unsigned int myIndex);
+
+    /**
      * @brief Activation function (tanh)
      * @param sum Weighted sum of inputs
      * @return Activated output in [-1, 1]
