@@ -49,6 +49,7 @@ void NeuralNetwork::forwardPropagation(const std::vector<double> &inputValues)
             + " input value(s), got " + std::to_string(inputValues.size()));
     }
 
+    inputLayer.back().setOutputValue(1.0);
     for (std::size_t i = 0; i < inputValues.size(); ++i) {
         inputLayer[i].setOutputValue(inputValues[i]);
     }
@@ -59,6 +60,7 @@ void NeuralNetwork::forwardPropagation(const std::vector<double> &inputValues)
         for (std::size_t n = 0; n + 1 < layer.size(); ++n) {
             layer[n].feedForward(prevLayer, static_cast<unsigned int>(n));
         }
+        layer.back().setOutputValue(1.0);
     }
 }
 
