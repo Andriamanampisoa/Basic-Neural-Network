@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <random>
+#include <stdexcept>
 
 Neuron::Neuron(unsigned int numOutputs)
     : _outputValue(0.0)
@@ -35,6 +36,29 @@ double Neuron::getOutputValue() const
 const std::vector<Connection> &Neuron::getOutputConnections() const
 {
     return (_outputConnections);
+}
+
+void Neuron::setConnectionWeight(unsigned int connectionIndex, double weight)
+{
+    if (connectionIndex >= _outputConnections.size()) {
+        throw std::out_of_range("Neuron::setConnectionWeight: connection index out of range");
+    }
+    _outputConnections[connectionIndex].weight = weight;
+}
+
+void Neuron::feedForward(const std::vector<Neuron> &prevLayer, unsigned int myIndex)
+{
+    double sum = 0.0;
+
+    for (std::size_t n = 0; n < prevLayer.size(); ++n) {
+        const std::vector<Connection> &connections = prevLayer[n].getOutputConnections();
+
+        if (myIndex >= connections.size()) {
+            throw std::out_of_range("Neuron::feedForward: myIndex out of range for previous layer connections");
+        }
+        sum += prevLayer[n].getOutputValue() * connections[myIndex].weight;
+    }
+    _outputValue = transferFunction(sum);
 }
 
 double Neuron::transferFunction(double sum)
