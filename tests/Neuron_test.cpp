@@ -11,6 +11,8 @@
 
 #include <cmath>
 #include <set>
+#include <stdexcept>
+#include <vector>
 
 namespace {
 
@@ -114,4 +116,51 @@ TEST(NeuronTest, TransferFunctionDerivative_MatchesFormula)
     const double expected = 1.0 - output * output;
 
     EXPECT_NEAR(Neuron::transferFunctionDerivative(output), expected, 1e-12);
+}
+
+TEST(NeuronTest, SetConnectionWeight_UpdatesWeight)
+{
+    Neuron neuron(2);
+
+    neuron.setConnectionWeight(0, 0.3);
+    neuron.setConnectionWeight(1, -0.7);
+
+    EXPECT_DOUBLE_EQ(neuron.getOutputConnections()[0].weight, 0.3);
+    EXPECT_DOUBLE_EQ(neuron.getOutputConnections()[1].weight, -0.7);
+}
+
+TEST(NeuronTest, SetConnectionWeight_ThrowsOnOutOfRange)
+{
+    Neuron neuron(1);
+
+    EXPECT_THROW(neuron.setConnectionWeight(1, 0.5), std::out_of_range);
+}
+
+TEST(NeuronTest, FeedForward_ComputesWeightedSumThenTanh)
+{
+    // prev layer: 1 neuron + bias, both with 1 connection to target index 0
+    std::vector<Neuron> prevLayer;
+    prevLayer.push_back(Neuron(1));
+    prevLayer.push_back(Neuron(1));
+
+    prevLayer[0].setOutputValue(0.5);
+    prevLayer[0].setConnectionWeight(0, 2.0);
+    prevLayer[1].setOutputValue(1.0); // bias
+    prevLayer[1].setConnectionWeight(0, -0.5);
+
+    Neuron target(0);
+    target.feedForward(prevLayer, 0);
+
+    const double expectedSum = 0.5 * 2.0 + 1.0 * (-0.5); // 0.5
+    EXPECT_NEAR(target.getOutputValue(), std::tanh(expectedSum), 1e-12);
+}
+
+TEST(NeuronTest, FeedForward_ThrowsWhenIndexExceedsConnections)
+{
+    std::vector<Neuron> prevLayer;
+    prevLayer.push_back(Neuron(1)); // only connection index 0
+    prevLayer[0].setOutputValue(1.0);
+
+    Neuron target(0);
+    EXPECT_THROW(target.feedForward(prevLayer, 1), std::out_of_range);
 }
