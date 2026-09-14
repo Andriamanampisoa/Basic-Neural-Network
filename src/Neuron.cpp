@@ -5,9 +5,10 @@
  * Description: Implementation file for the Neuron class
 */
 
-#include <random>
-
 #include "Neuron.hpp"
+
+#include <cmath>
+#include <random>
 
 Neuron::Neuron(unsigned int numOutputs)
     : _outputValue(0.0)
@@ -21,13 +22,9 @@ Neuron::Neuron(unsigned int numOutputs)
     }
 }
 
-double Neuron::randomWeight()
+void Neuron::setOutputValue(double value)
 {
-    static std::random_device randomDevice;
-    static std::mt19937 generator(randomDevice());
-    static std::uniform_real_distribution<double> distribution(-1.0, 1.0);
-
-    return (distribution(generator));
+    _outputValue = value;
 }
 
 double Neuron::getOutputValue() const
@@ -38,4 +35,24 @@ double Neuron::getOutputValue() const
 const std::vector<Connection> &Neuron::getOutputConnections() const
 {
     return (_outputConnections);
+}
+
+double Neuron::transferFunction(double sum)
+{
+    return (std::tanh(sum));
+}
+
+double Neuron::transferFunctionDerivative(double outputValue)
+{
+    // d/dx tanh(x) = 1 - tanh(x)^2
+    return (1.0 - outputValue * outputValue);
+}
+
+double Neuron::randomWeight()
+{
+    static std::random_device randomDevice;
+    static std::mt19937 generator(randomDevice());
+    static std::uniform_real_distribution<double> distribution(-1.0, 1.0);
+
+    return (distribution(generator));
 }

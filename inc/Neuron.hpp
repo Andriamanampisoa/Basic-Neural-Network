@@ -27,14 +27,17 @@ class Neuron
 {
     public:
 
+    /**
+     * @brief Construct a neuron with outgoing connections
+     * @param numOutputs Number of neurons in the next layer (excluding bias)
+     */
     Neuron(unsigned int numOutputs);
 
     /**
-     * @brief Random weight generator
-     * @details Generates a random weight between -1 and 1
-     * @return A random weight
+     * @brief Set the neuron output value
+     * @param value Activation / input value to store
      */
-    double randomWeight();
+    void setOutputValue(double value);
 
     /**
      * @brief Output value of the neuron
@@ -48,7 +51,29 @@ class Neuron
      */
     const std::vector<Connection> &getOutputConnections() const;
 
+    /**
+     * @brief Activation function (tanh)
+     * @param sum Weighted sum of inputs
+     * @return Activated output in [-1, 1]
+     */
+    static double transferFunction(double sum);
+
+    /**
+     * @brief Derivative of the activation function
+     * @param outputValue Already activated output (tanh(x))
+     * @return Derivative value used by back propagation
+     */
+    static double transferFunctionDerivative(double outputValue);
+
     private:
+
+    /**
+     * @brief Random weight generator
+     * @details Generates a random weight between -1 and 1
+     * @return A random weight
+     */
+    static double randomWeight();
+
     double _outputValue;
     std::vector<Connection> _outputConnections;
 };
